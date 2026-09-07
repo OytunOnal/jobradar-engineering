@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-label="Keyword weight sweep: strong postings in the top fifth, and best postings found, at weights 0 to 0.5">
+  <rect x="0" y="0" width="720" height="300" rx="12" fill="#1f2631"/>
+  <text x="24" y="34" fill="#f4f6f9" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="15" font-weight="600">How much should the keyword score weigh?</text>
+  <text x="24" y="54" fill="#aab4c2" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="12">1,183 judged postings · blend of keyword rank and embedding rank · weight on the keyword side</text>
+  <!-- axes -->
+  <line x1="70" y1="240" x2="690" y2="240" stroke="#3d4858" stroke-width="1"/>
+  <line x1="70" y1="90" x2="70" y2="240" stroke="#3d4858" stroke-width="1"/>
+  <g fill="#71809a" font-family="IBM Plex Mono, Consolas, monospace" font-size="11">
+    <text x="40" y="244">0%</text><text x="34" y="169">40%</text><text x="34" y="94">80%</text>
+    <text x="110" y="260" text-anchor="middle">0</text><text x="210" y="260" text-anchor="middle">0.1</text><text x="310" y="260" text-anchor="middle">0.2</text>
+    <text x="410" y="260" text-anchor="middle">0.3</text><text x="510" y="260" text-anchor="middle">0.4</text><text x="610" y="260" text-anchor="middle">0.5</text>
+    <text x="690" y="278" text-anchor="end">keyword weight</text>
+  </g>
+  <line x1="70" y1="165" x2="690" y2="165" stroke="#2c3541" stroke-width="1"/>
+  <!-- best postings found: 75 75 74 74 72 68 -->
+  <polyline fill="none" stroke="#3fd6c6" stroke-width="2.5" points="110,99.4 210,99.4 310,101.3 410,101.3 510,105 610,112.5"/>
+  <g fill="#3fd6c6"><circle cx="110" cy="99.4" r="4"/><circle cx="210" cy="99.4" r="4"/><circle cx="310" cy="101.3" r="4"/><circle cx="410" cy="101.3" r="4"/><circle cx="510" cy="105" r="4"/><circle cx="610" cy="112.5" r="4"/></g>
+  <!-- strong in top fifth: 34 34 34 34 33 31 -->
+  <polyline fill="none" stroke="#4ee39a" stroke-width="2.5" points="110,176.3 210,176.3 310,176.3 410,176.3 510,178.1 610,181.9"/>
+  <g fill="#4ee39a"><circle cx="110" cy="176.3" r="4"/><circle cx="210" cy="176.3" r="4"/><circle cx="310" cy="176.3" r="4"/><circle cx="410" cy="176.3" r="4"/><circle cx="510" cy="178.1" r="4"/><circle cx="610" cy="181.9" r="4"/></g>
+  <!-- chosen weight -->
+  <line x1="310" y1="90" x2="310" y2="240" stroke="#f0c75e" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="316" y="232" fill="#f0c75e" font-family="IBM Plex Mono, Consolas, monospace" font-size="11">chosen: 0.2</text>
+  <!-- legend -->
+  <g font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="12">
+    <rect x="470" y="70" width="10" height="3" fill="#3fd6c6"/><text x="486" y="74" fill="#aab4c2">best postings found (75% → 68%)</text>
+    <rect x="470" y="86" width="10" height="3" fill="#4ee39a"/><text x="486" y="90" fill="#aab4c2">strong in the top fifth (34% → 31%)</text>
+  </g>
+</svg>

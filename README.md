@@ -3,46 +3,96 @@
 </p>
 
 <p align="center">
-  A job discovery engine that reads employers' own hiring boards first-hand,<br>
-  judges every posting against a CV with a language model, and answers three questions per posting:<br>
-  <b>does it fit, will they sponsor a visa, is the language requirement real.</b>
+  Reads employers' own hiring boards first-hand, judges every posting against a CV,<br>
+  and answers three questions per posting: <b>does it fit, will they sponsor a visa, is the language requirement real.</b>
 </p>
 
 <p align="center">
-  <a href="ARCHITECTURE.md"><b>Architecture and decision records</b></a> &nbsp;·&nbsp;
-  <a href="MEASUREMENTS.md"><b>What was measured, and what it decided</b></a>
+  <a href="MEASUREMENTS.md"><b>Measurements</b></a> &nbsp;·&nbsp;
+  <a href="ARCHITECTURE.md"><b>Architecture and decision records</b></a>
 </p>
 
 ---
 
-> This is the public face of a private project. It holds the engineering story: the architecture, the decision records, and the measurements behind them. The code is private while the tool is being turned into a hosted product; parts of it are shared on request.
+> The public face of a private project: the engineering, not the code. The code stays private while the tool becomes a hosted product; parts of it are shared on request.
 
-## What it is
+![The radar: postings ranked by judged fit, with visa and country filters and the risk labels under each score](screenshot.png)
 
-JobRadar started as a personal tool for one job search and grew into a system with 575,859 postings from 30 applicant-tracking platforms, 53 board and aggregator connectors and 61,804 company boards discovered automatically. Every posting is scored three ways, each layer measured before it was trusted:
+## How it works
 
-1. **A keyword scorer** that gates and ranks on the user's own vocabulary. Deterministic, free, runs on every posting.
-2. **An embedding similarity** to a set of short "pseudo-adverts" generated from the CV. The query side, not the model, turned out to decide ranking quality (precision at 100 went from 0.30 with the raw CV to 0.46 with adverts).
-3. **A language-model judge** that reads each posting against the CV and fills a ledger — each requirement marked direct, adjacent or missing, with the ramp to close it — from which the score is computed rather than asked for. Thirteen prompt versions; the final one measured on 1,183 postings.
+```mermaid
+%%{init:{"theme":"base","themeVariables":{
+"primaryColor":"#1f2631","primaryTextColor":"#f4f6f9","primaryBorderColor":"#3d4858",
+"lineColor":"#3fd6c6","secondaryColor":"#1f2631","tertiaryColor":"#151a22",
+"clusterBkg":"#151a22","clusterBorder":"#2c3541","edgeLabelBackground":"#151a22","titleColor":"#aab4c2"
+},"flowchart":{"wrappingWidth":300,"curve":"basis"}}}%%
+flowchart LR
+  DISC["<b>Discovery</b><br/>Common Crawl · Wayback<br/>links in postings · name guesses"] -- "probed live" --> BOARDS[("61,804 company boards<br/>30 ATS platforms")]
+  BOARDS --> POOL
+  AGG["53 boards and aggregators"] --> POOL
+  POOL[("<b>The pool</b> · 575k postings<br/>nothing is ever deleted")]
+  POOL --> KW["<b>keyword score</b><br/>the user's own vocabulary"]
+  POOL --> EMB["<b>embedding similarity</b><br/>to adverts written from the CV"]
+  KW --> Q["queue · 0.2 / 0.8 blend"]
+  EMB --> Q
+  Q --> JUDGE["<b>the judge</b><br/>a ledger per requirement<br/>fit · visa · language"]
+  REG[("6 sponsor registers<br/>NL GB DK IE PT CZ")] --> JUDGE
+  JUDGE --> RADAR["<b>Radar</b><br/>ranked, risks labelled"]
+  classDef key fill:#0e2b27,stroke:#3fd6c6,stroke-width:2px,color:#f4f6f9
+  class BOARDS,POOL,RADAR key
+```
 
-Visa answers come from governments, not from vibes: the public sponsor registers of six countries (Netherlands, United Kingdom, Denmark, Ireland, Portugal, Czechia) are matched by employer name, so a licensed sponsor ranks first and says so. Postings are parsed into sections so each consumer reads the part it needs. Nothing is ever deleted: a posting the gates reject is stored and flagged, so a scorer fix is a re-score, not a re-crawl.
+Three scores per posting, each measured before it was trusted: a **keyword score** (deterministic, free), an **embedding similarity** to short adverts generated from the CV (the query text, not the model, decided ranking quality), and a **judge** that fills a per-requirement ledger from which the score is computed rather than asked for. Visa answers come from six governments' sponsor registers, matched by employer name.
 
-## The engineering, in five decisions
+## Five decisions
 
-- **Measure, then decide.** The embedding model, the query text, the keyword/embedding blend weight, the judge's reasoning effort, its temperature and its output ceiling were each chosen by a measurement with a frozen ground truth, and the losing options are kept in the record. [MEASUREMENTS.md](MEASUREMENTS.md)
-- **Facts, derivations and intent are separate layers.** Facts are immutable, derivations are versioned and recomputable, user data is small and sacred. Every derived value carries the version of the thing that made it, so "refresh" means "fill where the version is behind" everywhere. [ADR-8](ARCHITECTURE.md#adr-8--staleness-is-cache-invalidation-not-version-arithmetic)
-- **The judge writes a ledger, the code writes the score.** Asking a model for a number produced verdict flips on 13 of 20 postings across three identical runs; asking it to fill a per-requirement ledger and computing the number from that brought the flips under control and made every verdict explainable line by line.
-- **Risks are labelled, never hidden.** A stale date, a ghost-sounding repost, a missing sponsorship statement: each is a badge under the score. A hidden posting teaches nothing, and a wrong filter is invisible. [ADR-9](ARCHITECTURE.md#adr-9--disclose-the-risk-do-not-hide-the-posting)
-- **A guard for the bug the type checker cannot see.** When per-user fields moved off the shared posting row, six writers kept writing them and `tsc` passed every one: a nested relation write in the same object literal widens Prisma's argument type until sibling keys go unchecked. A text-level test now scans every posting query for a moved field, a split helper spread whole, or a local assigned from one; it was pointed at the six shapes that shipped broken and must fire on each.
+| | The decision | What forced it |
+|---|---|---|
+| 1 | **Measure, then decide.** Model, query text, blend weight, reasoning effort, temperature, ceiling: each chosen against a frozen ground truth; the losers are kept. | A "reasonable default" cost a week twice. [Measurements](MEASUREMENTS.md) |
+| 2 | **The judge writes a ledger; the code writes the score.** | Asking for a number flipped 13 of 20 verdicts across identical runs. |
+| 3 | **Facts, derivations and intent are separate layers.** Every derived value carries the version of what made it; "refresh" is "fill where the version is behind". | Overwriting in place destroyed the calibration data once. [ADR-8](ARCHITECTURE.md#adr-8--staleness-is-cache-invalidation-not-version-arithmetic) |
+| 4 | **Risks are labelled, never hidden.** | A hidden posting teaches nothing; a wrong filter is invisible. [ADR-9](ARCHITECTURE.md#adr-9--disclose-the-risk-do-not-hide-the-posting) |
+| 5 | **A text-level guard for the bug the type checker cannot see.** | Six writers kept writing moved fields and `tsc` passed every one. |
+
+<p align="center"><img src="blend-sweep.svg" alt="Keyword weight sweep: the curves are flat to 0.3 and fall after; 0.2 was chosen" width="720"></p>
+
+## The data model, in one picture
+
+```mermaid
+%%{init:{"theme":"base","themeVariables":{
+"primaryColor":"#1f2631","primaryTextColor":"#f4f6f9","primaryBorderColor":"#3d4858",
+"lineColor":"#3fd6c6","secondaryColor":"#1f2631","tertiaryColor":"#151a22",
+"clusterBkg":"#151a22","clusterBorder":"#2c3541","edgeLabelBackground":"#151a22","titleColor":"#aab4c2"
+},"flowchart":{"wrappingWidth":220,"curve":"basis"}}}%%
+flowchart TD
+  subgraph FACTS["facts · immutable"]
+    JOB["Job · the posting"]
+    JC["JobContent · the text"]
+  end
+  subgraph DERIVED["derivations · versioned, recomputable"]
+    JE["JobEmbedding · builtFrom"]
+    KSH["KeywordScoreHistory · scorerVersion"]
+    LJH["LlmJudgmentHistory · promptVersion"]
+  end
+  subgraph MINE["one user's view · small and sacred"]
+    UJ["UserJob · similarity, verdict, pursuit"]
+    UP["UserProfile · CV, adverts, two stamps"]
+  end
+  JOB --> JE --> UJ
+  JOB --> KSH
+  JOB --> LJH --> UJ
+  UP -- "queryStamp" --> UJ
+  UP -- "profileStamp" --> LJH
+  classDef key fill:#0e2b27,stroke:#3fd6c6,stroke-width:2px,color:#f4f6f9
+  class UJ,UP key
+```
+
+Facts never change. Derivations carry the version of what produced them. A user's data is small, keyed to the user, and stamped twice: an advert edit re-ranks the pool in seconds; a CV edit says how many verdicts go stale and what re-judging costs before it moves. The radar's list query over half a million rows measures 4 ms. [Full records →](ARCHITECTURE.md)
 
 ## Where it is going
 
-As of September 2026 the tool is being redesigned as a hosted, multi-user product for cross-border job seekers, with a free tier that searches the pool and paid plans that buy a daily budget of judged postings. The redesign runs on the same discipline: an evidence-graded inventory of every module, two rounds of grounded research, a one-pager that survived an adversarial review, and a plan whose first slice is a kill test, not a build.
+Since September 2026 the tool is being redesigned as a hosted product for cross-border job seekers: a free tier that searches the pool, paid plans that buy a daily budget of judged postings. Same discipline: an evidence-graded inventory, grounded research, a one-pager that survived an adversarial review, and a plan whose first slice is a kill test, not a build.
 
-## Stack
+**Stack.** TypeScript · Next.js · Prisma · SQLite → Postgres · Node's test runner (618 tests) · a seven-provider LLM chain behind one interface · Qwen3-Embedding.
 
-TypeScript throughout. Next.js App Router, Prisma, SQLite (moving to Postgres), Node's built-in test runner (618 tests), a seven-provider LLM chain behind one interface, Qwen3-Embedding for vectors. No framework for scraping: thirty ATS adapters with a pure mapper beside each fetcher, tested against fixtures.
-
-## Author
-
-Oytun Önal. The design decisions and the measurements are the portfolio; ask for the code.
+**Author.** Oytun Önal. The decisions and the measurements are the portfolio; ask for the code.
