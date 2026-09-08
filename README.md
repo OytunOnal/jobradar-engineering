@@ -6,13 +6,15 @@
 
 Reads employers' own hiring boards first-hand (not an aggregator's copy), judges every posting against your CV, and answers three questions per posting: **does it fit, will they sponsor a visa, is the language requirement real.**
 
-| | |
-|---|---|
-| **Who it is for** | People looking for a job in a country where they will need a visa, who have to know before applying whether the employer can sponsor and whether the fit is real. |
-| **What it does now** | **You cannot use it yet.** Today it is the author's local, single-user tool. Visa answers cover six countries with a public sponsor register: the Netherlands, the United Kingdom, Denmark, Ireland, Portugal and the Czech Republic. The pool holds about 576,000 postings, of which about 93,000 are live under the tool's current region gate (September 2026; the counts and their sources are in [Measurements § Coverage](MEASUREMENTS.md#coverage-as-counted-on-2026-09-07)). Each posting gets three scores: a keyword score (your own vocabulary), an embedding similarity (how close the posting is to short adverts written from your CV) and a judge's verdict (a language model that marks every requirement line of the posting against your CV before it scores). The hosted, multi-user version is being built; this line is replaced when its first version ships. |
-| **How to run it** | Not from here: the code is private, so there is nothing to clone. The measurements and the decision records below are the deliverable; ask for the code. |
-| **Feedback** | [Issues on this repository](https://github.com/OytunOnal/jobradar-engineering/issues); to ask for the code, write to the author via [github.com/OytunOnal](https://github.com/OytunOnal). |
-| **Licence** | The text, diagrams and measurements may be read, linked and quoted with attribution; other reuse needs permission ([LICENSE.md](LICENSE.md)). The software is not part of this repository and is not licensed by it. |
+**Who it is for.** People looking for a job in a country where they will need a visa, who have to know before applying whether the employer can sponsor and whether the fit is real.
+
+**What it does now.** **You cannot use it yet.** Today it is the author's local, single-user tool. Visa answers cover six countries with a public sponsor register: the Netherlands, the United Kingdom, Denmark, Ireland, Portugal and the Czech Republic. The pool holds about 576,000 postings, of which about 93,000 are live under the tool's current region gate (September 2026; the counts and their sources are in [Measurements § Coverage](MEASUREMENTS.md#coverage-as-counted-on-2026-09-07)). Each posting gets three scores: a keyword score (your own vocabulary), an embedding similarity (how close the posting is to short adverts written from your CV) and a judge's verdict (a language model that marks every requirement line of the posting against your CV before it scores). The hosted, multi-user version is being built; this line is replaced when its first version ships.
+
+**How to run it.** Not from here: the code is private, so there is nothing to clone. The measurements and the decision records below are the deliverable; ask for the code.
+
+**Feedback.** [Issues on this repository](https://github.com/OytunOnal/jobradar-engineering/issues); to ask for the code, write to the author via [github.com/OytunOnal](https://github.com/OytunOnal).
+
+**Licence.** The text, diagrams and measurements may be read, linked and quoted with attribution; other reuse needs permission ([LICENSE.md](LICENSE.md)). The software is not part of this repository and is not licensed by it.
 
 <p align="center">
   <a href="MEASUREMENTS.md"><b>Measurements</b></a> &nbsp;·&nbsp;
