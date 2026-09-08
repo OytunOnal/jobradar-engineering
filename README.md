@@ -1,6 +1,6 @@
-![The radar filtered to employers on a public sponsor register: the six register countries in the country row, and a London posting judged strong with its sponsor answer](screenshot.png)
+<p align="center"><img src="masthead.svg" alt="JobRadar" width="880"></p>
 
-<p align="center"><img src="masthead.svg" alt="JobRadar" width="640"></p>
+![The radar filtered to employers on a public sponsor register: the six register countries in the country row, and a London posting judged strong with its sponsor answer](screenshot.png)
 
 **This repository is deliberately thin: the engineering record of a private project, not its code.** The software is being turned into a hosted product; parts of the code are shared on request.
 
