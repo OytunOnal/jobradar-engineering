@@ -59,3 +59,17 @@ Every ranking layer was chosen by a measurement against a frozen ground truth. S
 ---
 
 Not here, on purpose: posting texts, the CV behind the ground truth, per-posting records. Personal or third-party data; the measurements are the point.
+
+## Coverage, as counted on 2026-09-07
+
+The numbers the README's first screen uses, with where each comes from. They are counts, not measurements of quality, and they move daily; the README is updated at each version, not at each count.
+
+| what | count | source |
+|---|---|---|
+| postings in the database | 575,859 | the Job table; nothing is deleted, delisted postings stay with a date |
+| of which live under the region gate | 93,279 | not delisted, not region-disqualified (a further ~184,000 from the US, Canada, India and Australia are in the database but gated) |
+| company boards discovered and probed live | 61,804 | the discovery registry |
+| applicant-tracking platforms read first-hand | 30 | one adapter each |
+| board and aggregator connectors | 53 | one adapter each |
+| public sponsor registers matched by employer name | 6 | NL, GB, DK, IE, PT, CZ |
+| unit tests | 630 | Node's test runner, 2026-09-08 |
